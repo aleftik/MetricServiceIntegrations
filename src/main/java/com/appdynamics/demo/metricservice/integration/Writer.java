@@ -1,6 +1,6 @@
-package com.appdynamics.demo.datadog.integration;
+package com.appdynamics.demo.metricservice.integration;
 
 public interface Writer {
 
-    public void write();
+    public void write(MetricUploadRequest request);
 }

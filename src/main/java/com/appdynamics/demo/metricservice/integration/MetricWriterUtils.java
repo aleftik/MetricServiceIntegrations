@@ -5,8 +5,12 @@ import com.appdynamics.demo.metricservice.integration.model.AppDynamicsNode;
 import com.appdynamics.demo.metricservice.integration.model.AppDynamicsTier;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
+import javax.json.Json;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -75,7 +79,7 @@ public class MetricWriterUtils {
         return tags.toArray(tagsArr);
     }
 
-    public static com.google.gson.JsonArray generateTagForBackendAsJson(String metricPath, MetricUploadRequest request) {
+    public static JsonArray generateTagForBackendAsJsonArray(String metricPath, MetricUploadRequest request) {
         JsonArray tags = new JsonArray();
         String [] tagArr = generateTagForBackend(metricPath, request);
         for (String tag:tagArr) {
@@ -84,7 +88,7 @@ public class MetricWriterUtils {
         return tags;
     }
 
-    public static com.google.gson.JsonArray generateTagAsJson(MetricUploadRequest request) {
+    public static JsonArray generateTagAsJsonArray(MetricUploadRequest request) {
         JsonArray tags = new JsonArray();
         String [] tagArr = generateTag( request);
         for (String tag:tagArr) {
@@ -114,13 +118,14 @@ public class MetricWriterUtils {
     }
 
 
-    public static JsonArray getTagsAsJson(String metricPath, MetricUploadRequest request) {
+    public static JsonArray getTagsAsJsonArray(String metricPath, MetricUploadRequest request) {
         if (metricPath.contains("Backend")) {
-            return generateTagForBackendAsJson(metricPath,request);
+            return generateTagForBackendAsJsonArray(metricPath,request);
         }   else {
-            return generateTagAsJson(request);
+            return generateTagAsJsonArray(request);
         }
     }
+
 
     public static String getHost(String merticPath, String [] tags) {
         if(merticPath.contains("Backend"))  {
@@ -137,6 +142,17 @@ public class MetricWriterUtils {
             }
         }
         return null;
+    }
+
+    public static JsonObject toJsonObject(JsonArray array) {
+        JsonObject obj = new JsonObject();
+        Iterator it = array.iterator();
+        while (it.hasNext()) {
+            JsonElement tag = (JsonElement) it.next();
+            String[] parts = tag.toString().split(":");
+            obj.addProperty(parts[0],parts[1]);
+        }
+        return obj;
     }
 
     public static String getType(String metricPath) {

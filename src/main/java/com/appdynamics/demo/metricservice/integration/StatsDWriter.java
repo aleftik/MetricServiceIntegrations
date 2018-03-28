@@ -7,17 +7,13 @@ import java.util.concurrent.BlockingQueue;
 import java.util.List;
 
 public class StatsDWriter implements  Writer {
-    private BlockingQueue<MetricUploadRequest> queue;
     private StatsDClient client;
 
-    public StatsDWriter(StatsDClient client, BlockingQueue<MetricUploadRequest> queue) {
-        this.queue = queue;
+    public StatsDWriter(StatsDClient client) {
         this.client = client;
     }
 
-    public void write() {
-        try {
-                MetricUploadRequest request = queue.take();
+    public void write(MetricUploadRequest request) {
                 List<AppDynamicsMetric> appDynamicsMetrics = request.getMetrics();
                 for (AppDynamicsMetric metric : appDynamicsMetrics) {
                     if (metric.getMetricValues().size() > 0) {
@@ -31,10 +27,6 @@ public class StatsDWriter implements  Writer {
                         }
                     }
                 }
-
-        } catch (InterruptedException ie) {
-            ie.printStackTrace();
-        }
     }
 
 
