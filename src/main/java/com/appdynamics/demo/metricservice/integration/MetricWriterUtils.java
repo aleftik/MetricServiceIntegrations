@@ -149,7 +149,8 @@ public class MetricWriterUtils {
         Iterator it = array.iterator();
         while (it.hasNext()) {
             JsonElement tag = (JsonElement) it.next();
-            String[] parts = tag.toString().split(":");
+            String jsonString = tag.getAsString();
+            String[] parts = jsonString.split(":");
             obj.addProperty(parts[0],parts[1]);
         }
         return obj;

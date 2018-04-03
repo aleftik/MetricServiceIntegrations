@@ -32,7 +32,7 @@ public abstract class AbstractHttpMerticWriter implements JsonSerializer<MetricU
         try {
             GsonBuilder gsonBuilder = new GsonBuilder();
             gsonBuilder.registerTypeAdapter(MetricUploadRequest.class, this);
-            Gson gson = gsonBuilder.setPrettyPrinting().create();
+            Gson gson = gsonBuilder.create();
             String json = gson.toJson(request);
             postMetrics(json);
 

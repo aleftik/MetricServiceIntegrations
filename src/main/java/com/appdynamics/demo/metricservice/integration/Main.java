@@ -80,7 +80,7 @@ public class Main implements  Runnable {
     public void run () {
         logger.info("Started Read at " + new Date(System.currentTimeMillis()));
             reader.read();
-        System.out.println("Read Completed at " + new Date(System.currentTimeMillis()));
+        logger.info("Read Completed at " + new Date(System.currentTimeMillis()));
         MetricUploadRequest request = null;
         try { request = queue.take();} catch (InterruptedException ie) {logger.log(Level.SEVERE,"Interrupted",ie);}
             for (Writer writer:writers) {

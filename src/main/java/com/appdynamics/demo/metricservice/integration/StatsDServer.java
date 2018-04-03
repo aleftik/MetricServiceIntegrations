@@ -1,4 +1,4 @@
-package com.appdynamics.demo.datadog.integration;
+package com.appdynamics.demo.metricservice.integration;
 
 import java.io.IOException;
 import java.net.DatagramPacket;

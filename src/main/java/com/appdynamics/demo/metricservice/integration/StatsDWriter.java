@@ -20,9 +20,6 @@ public class StatsDWriter implements  Writer {
                          if (metric.getMetricPath().startsWith("Backends")) {
                             client.recordGaugeValue(MetricWriterUtils.cleanupPathForBackend(metric.getMetricPath()), metric.getMetricValues().get(0).getValue(), MetricWriterUtils.generateTagForBackend(metric.getMetricPath(),request));
                         } else {
-                             if (metric.getMetricPath().contains("|/travel/createJournal.do|Average Response Time (ms)")) {
-                                 System.out.println("m|/travel/createJournal.do|Average Response Time (ms)" + metric.getMetricValues().get(0).getValue()) ;
-                             }
                             client.recordGaugeValue(MetricWriterUtils.cleanupPath(metric.getMetricPath()), metric.getMetricValues().get(0).getValue(), MetricWriterUtils.generateTag(request));
                         }
                     }
