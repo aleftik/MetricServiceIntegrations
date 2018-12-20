@@ -1,4 +1,4 @@
-package com.appdynamics.demo.metricservice.integration.model;
+package com.appdynamics.demo.metricservice.integration.appdynamics.model;
 
 import javax.xml.bind.annotation.*;
 

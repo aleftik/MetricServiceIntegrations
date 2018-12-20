@@ -18,6 +18,7 @@ import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.amazonaws.services.lambda.runtime.LambdaLogger;
 
 import com.google.gson.JsonObject;
+import com.iopipe.IOpipeService;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -47,7 +48,7 @@ import com.iopipe.IOpipeExecution;
  *
  */
 //public class UmbrellaLogLambda implements RequestHandler<S3Event, String> ,com.iopipe.SimpleRequestHandlerWrapper<S3Event,String> {
-public class IOPipeLogLambda extends SimpleRequestHandlerWrapper<S3Event,String> {
+public class IOPipeLogLambda  implements RequestHandler<S3Event, String> {
     private static final String REGION = "REGION";
     private static final String DD_API_KEY = "DD_API_KEY";
     private static final String LOG_HOST ="intake.logs.datadoghq.com";
@@ -56,7 +57,10 @@ public class IOPipeLogLambda extends SimpleRequestHandlerWrapper<S3Event,String>
     private LambdaLogger logger = null;
 
     protected final String wrappedHandleRequest(IOpipeExecution __exec, S3Event s3Event) {
-        return reallyHandleRequest(s3Event,__exec.context());
+        __exec.startTimestamp();
+
+//        return reallyHandleRequest(s3Event,__exec);
+        return  "";
     };
     /**
      * Main Lambda function
@@ -64,32 +68,34 @@ public class IOPipeLogLambda extends SimpleRequestHandlerWrapper<S3Event,String>
      * @param context - AWS Context
      * @return empty string
      */
-    public String reallyHandleRequest(S3Event s3event, Context context) {
-        logger = context.getLogger();
-        String region = System.getenv(REGION);
-        String apiKey = System.getenv(DD_API_KEY);
-        String functionName = context.getFunctionName().toLowerCase();
-        //validate the env
-        if (!validateEnv(region, apiKey)) {
-            logger.log("Valid Region and API Key required REGION:" + region + " DD_API_KEY:" + apiKey);
-            return "";
-        }
+    public String handleRequest(S3Event s3event, Context context) {
+        return IOpipeService.instance().<String>run(context, (__exec) -> {
+            logger = context.getLogger();
+            String region = System.getenv(REGION);
+            String apiKey = System.getenv(DD_API_KEY);
+            String functionName = context.getFunctionName().toLowerCase();
+            //validate the env
+            if (!validateEnv(region, apiKey)) {
+                logger.log("Valid Region and API Key required REGION:" + region + " DD_API_KEY:" + apiKey);
+                return "";
+            }
 
-        /*  process each log fle */
-        List<S3EventNotification.S3EventNotificationRecord> events = s3event.getRecords();
-        for (S3EventNotification.S3EventNotificationRecord record:events) {
-            AmazonS3 client = AmazonS3ClientBuilder.standard().withRegion(region).build();
-            S3Object file = client.getObject(record.getS3().getBucket().getName(),record.getS3().getObject().getKey());
-            List<UmbrellaLogRecord> records = processFile(file);
-            writeToLogStream(functionName, apiKey,records);
-            client.deleteObject(record.getS3().getBucket().getName(),record.getS3().getObject().getKey());
-        }
-        return "";
+            /*  process each log fle */
+            List<S3EventNotification.S3EventNotificationRecord> events = s3event.getRecords();
+            for (S3EventNotification.S3EventNotificationRecord record : events) {
+                AmazonS3 client = AmazonS3ClientBuilder.standard().withRegion(region).build();
+                S3Object file = client.getObject(record.getS3().getBucket().getName(), record.getS3().getObject().getKey());
+                List<UmbrellaLogRecord> records = processFile(file);
+                writeToLogStream(functionName, apiKey, records, __exec);
+                client.deleteObject(record.getS3().getBucket().getName(), record.getS3().getObject().getKey());
+            }
+            return "";
+            });
     }
 
     /**
      * Validate the environment varibale
-     * @param region - valid stringify amazon region e.g. us-west-2
+     * @param region - valid stringify cyberduamazon region e.g. us-west-2
      * @param apiKey - Datadog API Key
      * @return true if we have the region and key, false otherwise
      */
@@ -112,28 +118,41 @@ public class IOPipeLogLambda extends SimpleRequestHandlerWrapper<S3Event,String>
      * @param apiKey - account to write the record to
      * @param records - List of records to write
      */
-    private void writeToLogStream(String functionName, String apiKey, List<UmbrellaLogRecord> records) {
-        Socket socket = null;
-        PrintWriter out = null;
-        try {
-            SSLSocketFactory factory = (SSLSocketFactory) SSLSocketFactory.getDefault();
-            socket = factory.createSocket(LOG_HOST, LOG_PORT);
-            out = new PrintWriter(socket.getOutputStream(), true);
-            for (UmbrellaLogRecord record: records) {
-                JsonObject message =  toJson(functionName,record);
-                out.print(apiKey + " ");
-                out.println(message.toString());
-                logger.log("Writing record to log server:" + apiKey + " " + message.toString());
-            }
-            out.flush();
-        } catch (Exception ex) {
-            logger.log(ex.getMessage());
-        } finally {
-            close(out);
-            close(socket);
+//    private void writeToLogStream(String functionName, String apiKey, List<UmbrellaLogRecord> records) {
+//        Socket socket = null;
+//        PrintWriter out = null;
+//        try {
+//            SSLSocketFactory factory = (SSLSocketFactory) SSLSocketFactory.getDefault();
+//            socket = factory.createSocket(LOG_HOST, LOG_PORT);
+//            out = new PrintWriter(socket.getOutputStream(), true);
+//            for (UmbrellaLogRecord record: records) {
+//                JsonObject message =  toJson(functionName,record);
+//                out.print(apiKey + " ");
+//                out.println(message.toString());
+//                logger.log("Writing record to log server:" + apiKey + " " + message.toString());
+//            }
+//            out.flush();
+//        } catch (Exception ex) {
+//            logger.log(ex.getMessage());
+//        } finally {
+//            close(out);
+//            close(socket);
+//        }
+//
+//
+//    }
+
+    private void writeToLogStream(String functionName, String apiKey, List<UmbrellaLogRecord> records, IOpipeExecution execution)  {
+        for (UmbrellaLogRecord record: records) {
+            execution.customMetric("Action",record.action);
+            execution.customMetric("Category",record.categories);
+            execution.customMetric("Timestamp",record.timestamp);
+            execution.customMetric("QueryType",record.queryType);
+            execution.customMetric("ResponseCode",record.responseCode);
+            execution.customMetric("InternalIP",record.internalIp);
+            execution.customMetric("Identities",record.identities);
+            execution.customMetric("Domain",record.domain);
         }
-
-
     }
 
     /**

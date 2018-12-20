@@ -1,11 +1,10 @@
 package com.appdynamics.demo.metricservice.integration;
 
-import com.appdynamics.demo.metricservice.integration.model.*;
+import com.appdynamics.demo.metricservice.integration.appdynamics.model.*;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class MetricUploadRequest implements Serializable {
     private List<AppDynamicsMetric> metrics = new ArrayList<AppDynamicsMetric>();
@@ -13,6 +12,7 @@ public class MetricUploadRequest implements Serializable {
     private List<BusinessTransaction> bts = new ArrayList<BusinessTransaction>();;
     private List<AppDynamicsBackend> backends = new ArrayList<AppDynamicsBackend>();;
     private AppDynamicsTier tier;
+    private List<AppDynamicsTier> tiers = new ArrayList<AppDynamicsTier>();
 
     public MetricUploadRequest() {
         init();
@@ -42,6 +42,33 @@ public class MetricUploadRequest implements Serializable {
         return bts;
     }
 
+    public Map<String, AppDynamicsBackend> getBackendMap() {
+//        Map<String, AppDynamicsBackend> map =
+//                getBackends().stream().collect(Collectors.toMap(AppDynamicsBackend::getKey, item -> item));
+//        return map;
+        Map<String, AppDynamicsBackend> map = new HashMap<String, AppDynamicsBackend>();
+        //truncated names so we will duplicate
+        for (AppDynamicsBackend backend:getBackends()) {
+            map.put(backend.getName(),backend);
+        }
+        return map;
+    }
+
+    public Map<String, BusinessTransaction> getBusinessTransactionMap() {
+        Map<String, BusinessTransaction> map =
+                getBts().stream().collect(Collectors.toMap(BusinessTransaction::getKey, item -> item));
+        return map;
+
+    }
+
+    public Map<String, AppDynamicsTier> getTiersMap() {
+        Map<String, AppDynamicsTier> map =
+                getTiers().stream().collect(Collectors.toMap(AppDynamicsTier::getKey, item -> item));
+        return map;
+
+    }
+
+
     public void setBts(List<BusinessTransaction> bts) {
         this.bts = bts;
     }
@@ -69,5 +96,12 @@ public class MetricUploadRequest implements Serializable {
 
     public void addMetrics (Collection toAdd) {
         getMetrics().addAll(toAdd);
+    }
+    public List<AppDynamicsTier> getTiers() {
+        return tiers;
+    }
+
+    public void setTiers(List<AppDynamicsTier> tiers) {
+        this.tiers = tiers;
     }
 }

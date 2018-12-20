@@ -1,7 +1,11 @@
-package com.appdynamics.demo.metricservice.integration;
+package com.appdynamics.demo.metricservice.integration.signalfx;
 
+import com.appdynamics.demo.metricservice.integration.MetricUploadRequest;
+import com.appdynamics.demo.metricservice.integration.MetricWriterUtils;
+import com.appdynamics.demo.metricservice.integration.MetricWriterUtilsV2;
 import com.appdynamics.demo.metricservice.integration.api.AbstractHttpMerticWriter;
-import com.appdynamics.demo.metricservice.integration.model.AppDynamicsMetric;
+import com.appdynamics.demo.metricservice.integration.api.AbstractHttpWriter;
+import com.appdynamics.demo.metricservice.integration.appdynamics.model.AppDynamicsMetric;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -18,7 +22,7 @@ public class SignalFxHttpMetricWriter extends AbstractHttpMerticWriter {
     private static final Logger logger  = Logger.getLogger(SignalFxHttpMetricWriter.class.getName());
 
     public SignalFxHttpMetricWriter(String endPoint, String apiKey) {
-        super(endPoint,apiKey);
+        super(endPoint,apiKey,false);
     }
 
     @Override
@@ -35,14 +39,14 @@ public class SignalFxHttpMetricWriter extends AbstractHttpMerticWriter {
             if (metric.getMetricValues().size() > 0) {
                 String metricPath = metric.getMetricPath();
                 JsonObject fxMetric = new JsonObject();
-                fxMetric.addProperty("metric", MetricWriterUtils.getMetricPath(metricPath));
+                fxMetric.addProperty("metric", MetricWriterUtilsV2.getMetricName(metric,false ));
+
                 JsonObject dimensions = new JsonObject();
                 JsonObject tag = new JsonObject();
                 fxMetric.addProperty("value", metric.getMetricValues().get(0).getValue());
                 String[] tags = MetricWriterUtils.getTags(metricPath, metricUploadRequest);
-                fxMetric.addProperty("host", MetricWriterUtils.getHost(metricPath, tags));
-                JsonArray tagArray = MetricWriterUtils.getTagsAsJsonArray(metricPath, metricUploadRequest);
-                fxMetric.add("dimensions", MetricWriterUtils.toJsonObject(tagArray));
+                //fxMetric.addProperty("host", MetricWriterUtils.getHost(metricPath, tags));
+                fxMetric.add("dimensions", MetricWriterUtilsV2.toJsonObject(MetricWriterUtilsV2.getTags(metric,metricUploadRequest,false)));
                 fxMetric.addProperty("timestamp",metric.getMetricValues().get(0).getStartTimeInMillis());
                 metricList.add(fxMetric);
             }

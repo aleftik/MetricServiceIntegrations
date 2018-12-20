@@ -1,7 +1,8 @@
-package com.appdynamics.demo.metricservice.integration.model.umbrella;
+package com.appdynamics.demo.metricservice.integration.cisco.umbrella.model;
 
 
 import java.util.List;
+import java.util.Objects;
 
 
 public class DomainSecurityInfo {

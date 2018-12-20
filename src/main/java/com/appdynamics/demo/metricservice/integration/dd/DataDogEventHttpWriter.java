@@ -1,7 +1,8 @@
-package com.appdynamics.demo.metricservice.integration;
+package com.appdynamics.demo.metricservice.integration.dd;
 
+import com.appdynamics.demo.metricservice.integration.EventUploadRequest;
 import com.appdynamics.demo.metricservice.integration.api.AbstractHttpEventWriter;
-import com.appdynamics.demo.metricservice.integration.model.AppDynamicsBrowserEvent;
+import com.appdynamics.demo.metricservice.integration.appdynamics.model.AppDynamicsBrowserEvent;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -23,8 +24,8 @@ public class DataDogEventHttpWriter extends AbstractHttpEventWriter {
 
         for (AppDynamicsBrowserEvent event : eventUploadRequest.getEvents()) {
             JsonArray tags = generateTags(event);
-            
-            if (event.getTotalEndUserTime() == null) {
+
+            if (event.getTotalEndUserTime() != null) {
                 JsonObject endUserTotalTime = new JsonObject();
                 metricArray.add(endUserTotalTime);
                 endUserTotalTime.addProperty("metric", "end_user.browser.total_end_user_time");
@@ -59,7 +60,7 @@ public class DataDogEventHttpWriter extends AbstractHttpEventWriter {
                 rpmTags.addAll(tags);
 
             }
-
+    
             if(event.getResponseAvailbleTime() != null) {
                 JsonObject responseAvailableTime = new JsonObject();
                 metricArray.add(responseAvailableTime);

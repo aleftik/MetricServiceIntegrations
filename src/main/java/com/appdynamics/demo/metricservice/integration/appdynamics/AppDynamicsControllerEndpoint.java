@@ -1,6 +1,8 @@
-package com.appdynamics.demo.metricservice.integration;
+package com.appdynamics.demo.metricservice.integration.appdynamics;
 
-public class AppDynamicsControllerEndpoint extends AbstractAppDynamicsRESTEndpoint {
+import com.appdynamics.demo.metricservice.integration.api.AbstractRESTEndpoint;
+
+public class AppDynamicsControllerEndpoint extends AbstractRESTEndpoint {
     private String username;
     private String password;
 

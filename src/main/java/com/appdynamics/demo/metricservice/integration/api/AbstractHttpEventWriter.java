@@ -1,4 +1,6 @@
-package com.appdynamics.demo.metricservice.integration;
+package com.appdynamics.demo.metricservice.integration.api;
+
+import com.appdynamics.demo.metricservice.integration.EventUploadRequest;
 
 import com.google.gson.*;
 
@@ -6,6 +8,7 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
+
 import javax.ws.rs.core.Response;
 import java.lang.reflect.Type;
 import java.util.logging.Level;
@@ -23,7 +26,6 @@ public abstract class AbstractHttpEventWriter  implements JsonSerializer<EventUp
         this.apiKey = apiKey;
     }
 
-
     public void write(EventUploadRequest request) {
         try {
             GsonBuilder gsonBuilder = new GsonBuilder();
@@ -31,22 +33,20 @@ public abstract class AbstractHttpEventWriter  implements JsonSerializer<EventUp
             Gson gson = gsonBuilder.create();
             String json = gson.toJson(request);
             postMetrics(json);
-
         } catch (Exception ie) {
             logger.log(Level.SEVERE,"Error Writing Http Metrics",ie);
         }
-
     }
 
     public void postMetrics(String json) {
         Client client = ClientBuilder.newClient();
         Response response = getRequest().post(Entity.json(json));
-        logger.info("Response:" + response.getStatus());
+        logger.info("Response from DD for events:" + response.getStatus());
     }
 
     protected Invocation.Builder getRequest() {
         Client client = ClientBuilder.newClient();
-        return client.target(this.endpointURL).request();
+        return client.target(this.endpointURL + "?api_key="+ getApiKey()).request();
     }
 
     public String getEndpointURL() {

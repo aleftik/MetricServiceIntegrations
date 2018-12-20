@@ -3,7 +3,7 @@
  * @author Adam Leftik
  * @version 4/10/2018
  */
-package com.appdynamics.demo.metricservice.integration.umbrella;
+package com.appdynamics.demo.metricservice.integration.cisco.umbrella;
 
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.lambda.runtime.Context;
@@ -32,6 +32,7 @@ import java.util.List;
 
 import java.util.zip.GZIPInputStream;
 
+
 /**
  *
  * This is a lambda function that needs to be  triggered by S3 Events to take a .gziped log file from umbrella
@@ -42,6 +43,7 @@ import java.util.zip.GZIPInputStream;
  *     Amazon Regions Enum</a>
  *
  */
+//public class UmbrellaLogLambda implements RequestHandler<S3Event, String> ,com.iopipe.SimpleRequestHandlerWrapper<S3Event,String> {
 public class UmbrellaLogLambda implements RequestHandler<S3Event, String> {
     private static final String REGION = "REGION";
     private static final String DD_API_KEY = "DD_API_KEY";
@@ -58,6 +60,7 @@ public class UmbrellaLogLambda implements RequestHandler<S3Event, String> {
      * @return empty string
      */
     public String handleRequest(S3Event s3event, Context context) {
+
         logger = context.getLogger();
         String region = System.getenv(REGION);
         String apiKey = System.getenv(DD_API_KEY);

@@ -1,4 +1,4 @@
-package com.appdynamics.demo.metricservice.integration.cisco;
+package com.appdynamics.demo.metricservice.integration.cisco.umbrella;
 
 import com.appdynamics.demo.metricservice.integration.api.AbstractRESTEndpoint;
 

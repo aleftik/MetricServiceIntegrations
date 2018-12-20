@@ -1,10 +1,9 @@
-package com.appdynamics.demo.metricservice.integration.model;
+package com.appdynamics.demo.metricservice.integration.appdynamics.model;
 
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import javax.xml.bind.annotation.XmlElement;
-import java.beans.Transient;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +20,7 @@ public class AppDynamicsBackend {
     private String applicationComponentNodeId;
     @XmlElement
     private Long tierId;
+
     @XmlElementWrapper(name="properties")
     @XmlElement(name="name-value")
     private List<AppDynamicsBackendProperty> props;

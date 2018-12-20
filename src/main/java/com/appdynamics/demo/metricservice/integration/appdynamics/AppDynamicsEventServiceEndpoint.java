@@ -1,6 +1,8 @@
-package com.appdynamics.demo.metricservice.integration;
+package com.appdynamics.demo.metricservice.integration.appdynamics;
 
-public class AppDynamicsEventServiceEndpoint extends AbstractAppDynamicsRESTEndpoint {
+import com.appdynamics.demo.metricservice.integration.api.AbstractRESTEndpoint;
+
+public class AppDynamicsEventServiceEndpoint extends AbstractRESTEndpoint {
 
     private String accountKey;
     private String apiKey;

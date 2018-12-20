@@ -1,8 +1,8 @@
-package com.appdynamics.demo.metricservice.integration;
+package com.appdynamics.demo.metricservice.integration.api;
 
-public abstract class AbstractAppDynamicsRESTEndpoint {
+public abstract class AbstractRESTEndpoint {
     private String host = null;
-    public AbstractAppDynamicsRESTEndpoint(String host) {
+    public AbstractRESTEndpoint(String host) {
         this.host = host;
     }
 

@@ -1,4 +1,89 @@
 package com.appdynamics.demo.metricservice.integration.api;
 
-public abstract class AbstractHttpWrite {
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.glassfish.jersey.apache.connector.ApacheClientProperties;
+import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
+import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.client.ClientProperties;
+
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.Invocation;
+import javax.ws.rs.core.Response;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+public abstract class AbstractHttpWriter {
+    private Logger logger = Logger.getLogger(AbstractHttpWriter.class.getName());
+    private String endpointURL = null;
+    private String apiKey = null;
+    private static ClientConfig clientConfig = null;
+    boolean doPut = false;
+
+    static {
+        clientConfig = new ClientConfig();
+        clientConfig.property(ClientProperties.READ_TIMEOUT, TimeConstants.TWO_MINUTES);
+        clientConfig.property(ClientProperties.CONNECT_TIMEOUT, TimeConstants.TWENTY_SECONDS);
+        PoolingHttpClientConnectionManager connectionManager =
+                new PoolingHttpClientConnectionManager();
+        connectionManager.setMaxTotal(5000);
+        connectionManager.setDefaultMaxPerRoute(5000);
+        clientConfig.property(ApacheClientProperties.CONNECTION_MANAGER, connectionManager);
+        clientConfig.property(ApacheClientProperties.CONNECTION_MANAGER_SHARED, true);
+        clientConfig.connectorProvider(new ApacheConnectorProvider());
+    }
+
+    public AbstractHttpWriter (String endPoint, String apiKey, boolean doPut) {
+        this.endpointURL = endPoint;
+        this.apiKey = apiKey;
+        this.doPut = doPut;
+    }
+
+    public void postMetrics(String json, boolean doPut) {
+        if (!"{}".equals(json)) {
+            Client client = ClientBuilder.newClient(AbstractHttpWriter.clientConfig);
+            Response response = null;
+            if (doPut) {
+                response = getRequest().put(Entity.json(json));
+            } else {
+                response = getRequest().post(Entity.json(json));
+            }
+            logger.log(Level.FINEST, json);
+            logger.log(Level.FINE, "Response Code:" + response.getStatus());
+            String resp = response.readEntity(String.class);
+
+            if ((response.getStatus() == 200) || (response.getStatus() == 202)) {
+                logger.log(Level.FINEST, "Response:" + resp);
+            } else {
+
+                logger.severe("Error from server:" + resp + " response code: " + response.getStatus() + " payload:" + json);
+            }
+
+            close(response);
+        }
+    }
+
+    protected Invocation.Builder getRequest() {
+        Client client = ClientBuilder.newClient();
+        return client.target(this.endpointURL).request();
+    }
+
+    public String getEndpointURL() {
+        return endpointURL;
+    }
+
+    public String getApiKey() {
+        return apiKey;
+    }
+
+    public void close(Response response) {
+        if (response != null) {
+            try {
+                response.close();
+            } catch (Exception ex) {
+                logger.severe(ex.toString());
+            }
+        }
+    }
 }

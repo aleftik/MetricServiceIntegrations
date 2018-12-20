@@ -1,4 +1,4 @@
-package com.appdynamics.demo.metricservice.integration.model.umbrella;
+package com.appdynamics.demo.metricservice.integration.cisco.umbrella.model;
 
 import javax.xml.bind.annotation.XmlRootElement;
 

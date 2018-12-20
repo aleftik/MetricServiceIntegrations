@@ -1,4 +1,4 @@
-package com.appdynamics.demo.metricservice.integration.model;
+package com.appdynamics.demo.metricservice.integration.appdynamics.model;
 
 import javax.xml.bind.annotation.*;
 import java.util.List;
@@ -111,6 +111,12 @@ public class AppDynamicsMetric {
     public boolean isCustomMetric() {
         if (getMetricPath()== null) return false;
         if (getMetricPath().contains("Custom Metrics"))return true;
+        return false;
+    }
+
+    public boolean isCounter() {
+        if (getMetricPath()== null) return false;
+        if (getMetricPath().toLowerCase().contains("per minute") || getMetricPath().toLowerCase().contains("Stall Count")) return true;
         return false;
     }
 }

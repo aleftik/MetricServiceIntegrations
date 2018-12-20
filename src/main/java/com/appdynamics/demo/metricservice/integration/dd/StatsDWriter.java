@@ -1,7 +1,9 @@
-package com.appdynamics.demo.metricservice.integration;
+package com.appdynamics.demo.metricservice.integration.dd;
 
+import com.appdynamics.demo.metricservice.integration.MetricUploadRequest;
+import com.appdynamics.demo.metricservice.integration.MetricWriterUtils;
 import com.appdynamics.demo.metricservice.integration.api.MetricWriter;
-import com.appdynamics.demo.metricservice.integration.model.*;
+import com.appdynamics.demo.metricservice.integration.appdynamics.model.AppDynamicsMetric;
 import com.timgroup.statsd.StatsDClient;
 
 import java.util.List;

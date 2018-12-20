@@ -1,4 +1,4 @@
-package com.appdynamics.demo.metricservice.integration.model;
+package com.appdynamics.demo.metricservice.integration.appdynamics.model;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -19,6 +19,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
       <useRange>true</useRange>
     </metric-value>
  */
+
 @XmlRootElement(name="metric-value")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class AppDynamicsMetricValue {

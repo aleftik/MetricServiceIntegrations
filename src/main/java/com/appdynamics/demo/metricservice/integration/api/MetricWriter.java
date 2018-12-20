@@ -1,4 +1,6 @@
-package com.appdynamics.demo.metricservice.integration;
+package com.appdynamics.demo.metricservice.integration.api;
+
+import com.appdynamics.demo.metricservice.integration.MetricUploadRequest;
 
 public interface MetricWriter {
 
