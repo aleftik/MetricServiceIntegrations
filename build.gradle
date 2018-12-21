@@ -43,6 +43,7 @@ dependencies {
 //    compile 'com.bugsnag:bugsnag:3.+';
 
     compile fileTree(dir: 'libs', includes: ['*.jar']);
+    testCompile "org.testng:testng:6.9.10"
 }
 
 jar {

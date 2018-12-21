@@ -57,6 +57,29 @@ public class MetricWriterUtilsV2 {
         if (metric.isNetworkVizMetric()) {
             addTagsForFlows(tags,metric,request, sanitize);
         }
+        if (metric.isCustomMetric()) {
+            addTagsForCustomMetric(tags, metric, request, sanitize);
+        }
+        return tags;
+    }
+
+    static JsonArray addTagsForHaProxyCustomMetric(JsonArray tags,AppDynamicsMetric metric, MetricUploadRequest request,boolean sanitize) {
+        String[] pathComponents = metric.getMetricPath().split("\\|");
+        //pathComponents should be [Application Infrastructure Performance|<tier name>|Custom Metric|HA Proxy|<entity name>|[backend/api1]|<metric name>
+        String tierName = pathComponents[1];
+        String entityName = pathComponents[4];
+        String portName = pathComponents[5];
+        tags.add("tier:" + tierName);
+        tags.add("haproxy_entity:" + entityName);
+        tags.add("haproxy_direction:" + portName);
+        return tags;
+    }
+
+    static JsonArray addTagsForCustomMetric(JsonArray tags,AppDynamicsMetric metric, MetricUploadRequest request,boolean sanitize) {
+        String metricPath = metric.getMetricPath();
+        if (metricPath.toUpperCase().contains("HAPROXY")) {
+            return addTagsForHaProxyCustomMetric(tags, metric, request, sanitize);
+        }
 
         return tags;
     }
@@ -231,7 +254,19 @@ public class MetricWriterUtilsV2 {
         return buf.toString();
     }
 
+    public static String getMetricNameForHaProxyCustomMetric(String appdPath) {
+        String[] pathComponents = appdPath.split("\\|");
+        StringBuilder buf = new StringBuilder();
+        buf.append("appdynamics.custom_metric.haproxy.");
+        //pathComponents should be [Application Infrastructure Performance|<tier name>|Custom Metric|HA Proxy|<entity name>|[backend/api1]|<metric name>
+        buf.append(pathComponents[6]);
+        return buf.toString();
+    }
+
     public static String getMetricNameForCustom(String appdPath) {
+        if (appdPath.toUpperCase().contains("HAPROXY")) {
+            return getMetricNameForHaProxyCustomMetric(appdPath);
+        }
         StringBuffer buf = new StringBuffer("appdynamics.custom_metric.");
         appdPath = StringUtils.remove(appdPath, "Application Infrastructure Performance|App Server|Custom Metrics|");
         appdPath = appdPath.toLowerCase();
