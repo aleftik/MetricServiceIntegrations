@@ -294,18 +294,35 @@ public class AnamolyHandler extends AbstractHandler implements Runnable {
     }
 
     private String buildEvent() {
+        JsonArray events = new JsonArray();
         JsonObject event = new JsonObject();
         event.addProperty("title","QoSPol Updated");
         event.addProperty("text", "");
         event.addProperty("date_happened",(System.currentTimeMillis()/1000));
         JsonArray tags = new JsonArray();
         tags.add("application:store");
-        tags.add("sources:Cisco ACI");
+        tags.add("sources:cisco aci");
         event.add("tags",tags);
         event.addProperty("priority","normal");
         event.addProperty("alert_type", "info");
-        event.addProperty("source_type_name","Cisco ACI");
-        return event.toString();
+        event.addProperty("source_type_name","cisco aci");
+        events.add(event);
+
+
+        JsonObject event = new JsonObject();
+        event.addProperty("title","Updating APIC configurations");
+        event.addProperty("text", "Setting new Quality of Service parameters");
+        event.addProperty("date_happened",(System.currentTimeMillis()/1000)-2);
+        JsonArray tags = new JsonArray();
+        tags.add("application:store");
+        tags.add("sources:puppet");
+        event.add("tags",tags);
+        event.addProperty("priority","normal");
+        event.addProperty("alert_type", "info");
+        event.addProperty("source_type_name","puppet");
+        events.add(event);
+
+        return events.toString();
     }
 
     private String buildRevenueMetric() {
