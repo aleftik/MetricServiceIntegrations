@@ -286,15 +286,17 @@ public class AnamolyHandler extends AbstractHandler implements Runnable {
     }
 
     private void fireEvent() {
+        String event2 = buildEvent2();
         String json = buildEvent();
         String fxJson = buildFXEvent();
         postDD(json,true);
+        postDD(event2,true);
         postFX(fxJson, true);
 
     }
 
     private String buildEvent() {
-        JsonArray events = new JsonArray();
+
         JsonObject event = new JsonObject();
         event.addProperty("title","QoSPol Updated");
         event.addProperty("text", "");
@@ -306,23 +308,7 @@ public class AnamolyHandler extends AbstractHandler implements Runnable {
         event.addProperty("priority","normal");
         event.addProperty("alert_type", "info");
         event.addProperty("source_type_name","cisco aci");
-        events.add(event);
-
-
-        JsonObject puppetEvent = new JsonObject();
-        puppetEvent.addProperty("title","Updating APIC configurations");
-        puppetEvent.addProperty("text", "Setting new Quality of Service parameters");
-        puppetEvent.addProperty("date_happened",(System.currentTimeMillis()/1000)-2);
-        JsonArray puppetTags = new JsonArray();
-        puppetTags.add("application:store");
-        puppetTags.add("sources:puppet");
-        puppetEvent.add("tags",puppetTags);
-        puppetEvent.addProperty("priority","normal");
-        puppetEvent.addProperty("alert_type", "info");
-        puppetEvent.addProperty("source_type_name","puppet");
-        events.add(puppetEvent);
-
-        return events.toString();
+        return event.toString();
     }
 
     private String buildRevenueMetric() {
@@ -344,6 +330,22 @@ public class AnamolyHandler extends AbstractHandler implements Runnable {
         datapoints.add("gauge",gauges);
         return datapoints.toString();
 
+    }
+
+
+    public String buildEvent2() {
+        JsonObject puppetEvent = new JsonObject();
+        puppetEvent.addProperty("title","Updating APIC configurations");
+        puppetEvent.addProperty("text", "Setting new Quality of Service parameters");
+        puppetEvent.addProperty("date_happened",((System.currentTimeMillis()-2000)/1000));
+        JsonArray puppetTags = new JsonArray();
+        puppetTags.add("application:store");
+        puppetTags.add("sources:puppet");
+        puppetEvent.add("tags",puppetTags);
+        puppetEvent.addProperty("priority","normal");
+        puppetEvent.addProperty("alert_type", "info");
+        puppetEvent.addProperty("source_type_name","puppet");
+        return puppetEvent.toString();
     }
 
     private String buildBTMetricsForFx(String btname, boolean jitter) {
